@@ -26,7 +26,7 @@ st.set_page_config(
 
 # Application Header & Title
 st.title("FlowGuard-MPC: Adaptive Model-Predictive Production Choke Controller")
-st.caption("Autonomous Safe Oil Well Optimization - Honeywell Hackathon Round 2")
+st.caption("Autonomous Safe Oil Well Optimization")
 
 # Sidebar Configuration & Simulation Controls
 st.sidebar.header("Simulation Settings")

@@ -25,12 +25,12 @@ def run_scenario(scenario_name, target_profile, timesteps=50, initial_choke=30.0
     
     Parameters:
         scenario_name (str): Identifier for saving plots and output logging.
-        target_profile (dict/float): Target flow rate profile across time.
+        target_profile (dict/float/list): Target flow rate profile across time.
         timesteps (int): Total simulation hours.
         initial_choke (float): Initial choke position %.
         
     Returns:
-        pd.DataFrame: Simulation process telemetry log dataframe.
+        tuple: (pd.DataFrame telemetry log, list rejection_log)
     """
     sim = OilWellSimulator(initial_choke=initial_choke, seed=42)
     controller = AutonomousChokeController(whp_min=210.0, flp_min=150.0, bhp_min=2850.0, max_ramp=5.0)
@@ -43,8 +43,10 @@ def run_scenario(scenario_name, target_profile, timesteps=50, initial_choke=30.0
     for t in range(timesteps):
         if isinstance(target_profile, dict):
             target_q = target_profile.get(t, list(target_profile.values())[-1])
+        elif isinstance(target_profile, (list, tuple)):
+            target_q = target_profile[t] if t < len(target_profile) else target_profile[-1]
         else:
-            target_q = target_profile
+            target_q = float(target_profile)
             
         # Step 1: Controller computes optimal safe choke position for next 1-hour step
         next_u = controller.compute_next_choke_position(current_u, target_q, current_state, time_step=t)
@@ -72,7 +74,10 @@ def run_scenario(scenario_name, target_profile, timesteps=50, initial_choke=30.0
     plot_results(df, scenario_name, controller.rejection_log)
     return df, controller.rejection_log
 
-def plot_results(df, scenario_name, rejection_log):
+# Alias function for notebook compatibility
+run_simulation = run_scenario
+
+def plot_results(df, scenario_name, rejection_log=None):
     """
     Renders publication-grade 5-panel trend plots for process telemetry.
     """
@@ -119,6 +124,9 @@ def plot_results(df, scenario_name, rejection_log):
     plt.savefig(output_filename, dpi=300)
     plt.close()
     print(f"Generated plot: {output_filename}")
+
+# Alias function for notebook compatibility
+plot_scenario_results = plot_results
 
 if __name__ == "__main__":
     print("=== Running Scenario Demonstrations for FlowGuard-MPC ===")
