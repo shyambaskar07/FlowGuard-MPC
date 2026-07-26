@@ -26,6 +26,7 @@ def package_submission():
         "README.md",
         "requirements.txt",
         "FlowGuard_MPC_Architecture_Diagram.png",
+        "Place_where_you_have_to_change_the_code_to_run_it_in_your_simulator.png",
         "scenario_A_results.png",
         "scenario_B_results.png",
         "scenario_C_results.png"
