@@ -26,7 +26,7 @@ st.set_page_config(
 
 # Application Header & Title
 st.title("FlowGuard-MPC: Adaptive Model-Predictive Production Choke Controller")
-st.caption("Autonomous Safe Oil Well Optimization")
+st.caption("Autonomous Safe Oil Well Optimization - Honeywell Hackathon Round 2")
 
 # Sidebar Configuration & Simulation Controls
 st.sidebar.header("Simulation Settings")
@@ -79,7 +79,7 @@ if st.button("Run FlowGuard-MPC Simulation", use_container_width=True):
             active_target = target_q
             
         # Step 1: Compute optimal safe choke move using FlowGuard-MPC
-        next_u = controller.compute_next_choke_position(current_u, active_target, current_state)
+        next_u = controller.compute_next_choke_position(current_u, active_target, current_state, time_step=t)
         
         # Step 2: Step physical simulator
         actual_q, whp, flp, bhp = sim.step(next_u)
@@ -130,7 +130,7 @@ if st.button("Run FlowGuard-MPC Simulation", use_container_width=True):
     fig.add_trace(go.Scatter(x=df['Time'], y=df['BHP'], name="BHP", line=dict(color='#FF9900')), row=4, col=1)
     fig.add_trace(go.Scatter(x=df['Time'], y=[2850.0]*len(df), name="BHP Limit", line=dict(color='#FF3333', dash='dot')), row=4, col=1)
     
-    # Panel 5: Choke opening percentage - Bright Electric Cyan (#00E5FF) for high contrast visibility on dark/light themes
+    # Panel 5: Choke opening percentage - Bright Electric Cyan (#00E5FF) for high contrast visibility
     fig.add_trace(go.Scatter(x=df['Time'], y=df['Choke'], name="Choke Opening (%)", line=dict(color='#00E5FF', width=2)), row=5, col=1)
     
     fig.update_layout(height=1000, title_text="Live FlowGuard-MPC Process Telemetry & Control Curves", showlegend=True)
@@ -139,7 +139,7 @@ if st.button("Run FlowGuard-MPC Simulation", use_container_width=True):
     # Diagnostic Rejection Log Viewer
     with st.expander("View Controller Candidate Rejection Log (Safety Filter Trace)"):
         if controller.rejection_log:
-            st.dataframe(pd.DataFrame(controller.rejection_log).tail(20))
+            st.dataframe(pd.DataFrame(controller.rejection_log))
         else:
             st.success("No candidate moves breached safety constraints!")
 

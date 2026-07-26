@@ -157,9 +157,14 @@ class AutonomousChokeController:
                 
         return True, None, trajectory[0]
 
-    def compute_next_choke_position(self, u_curr, target_Q, current_state):
+    def compute_next_choke_position(self, u_curr, target_Q, current_state, time_step=0):
         """
         Computes the optimal choke position for the next 1-hour control step.
+        Parameters:
+            u_curr (float): Current choke position (%).
+            target_Q (float): Target production rate (bbl/hr).
+            current_state (dict): Telemetry dictionary {'Q', 'WHP', 'FLP', 'BHP'}.
+            time_step (int): Current simulation control interval hour (default: 0).
         """
         filtered_state = self.telemetry_filter.filter(current_state)
         
@@ -182,8 +187,9 @@ class AutonomousChokeController:
             
             if not is_valid:
                 self.rejection_log.append({
-                    'u_curr': u_curr,
-                    'candidate_u': candidate_u,
+                    'Time (hr)': time_step,
+                    'u_curr (%)': round(u_curr, 1),
+                    'candidate_u (%)': round(candidate_u, 1),
                     'reason': reason
                 })
                 continue
